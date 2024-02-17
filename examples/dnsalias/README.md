@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Outbound firewall rule example
+# DNS alias example
 
-Allows you to manage an Azure SQL Outbound Firewall Rule.
+Manages a MS SQL Server DNS Alias.
 
 ```hcl
 terraform {
@@ -60,15 +60,12 @@ module "sql_server" {
   sqlserver_name      = module.naming.sql_server.name_unique
   resource_group_name = azurerm_resource_group.this.name
 
-  outbound_firewall_rule = {
-    rule1 = {
-      name = "sqlexamplefdqn.database.windows.net"
+  dns_alias = {
+    dnsalias = {
+      name = "example-dns-alias"
     },
-    rule2 = {
-      name = "sqlexamplefdqn2.database.windows.net"
-    },
-    rule3 = {
-      name = "sqlexamplefdqn3.database.windows.net"
+    dnsalias2 = {
+      name = "example2-dns-alias"
     }
   }
 }
