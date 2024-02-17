@@ -1,25 +1,14 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azurerm-avm-template
+# terraform-azurerm-avm-res-sql-server
 
-This is a template repo for Terraform Azure Verified Modules.
-
-Things to do:
-
-1. Set up a GitHub repo environment called `test`.
-1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
-1. Create a user-assigned managed identity in your test subscription.
-1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
-1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
-1. Search and update TODOs within the code and remove the TODO comments once complete.
-
-Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+Manages a Microsoft SQL Azure Database Server.
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.6.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0)
 
@@ -37,13 +26,12 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
-- [azurerm_TODO_the_resource_for_this_module.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/TODO_the_resource_for_this_module) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
-- [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
-- [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
+- [random_password.main](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) (resource)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -51,21 +39,62 @@ The following resources are used by this module:
 
 The following input variables are required:
 
-### <a name="input_name"></a> [name](#input\_name)
-
-Description: The name of the this resource.
-
-Type: `string`
-
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
 Description: The resource group where the resources will be deployed.
 
 Type: `string`
 
+### <a name="input_sqlserver_name"></a> [sqlserver\_name](#input\_sqlserver\_name)
+
+Description: The name of this resource.
+
+Type: `string`
+
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login)
+
+Description: The administrator login name for the new server. Required unless azuread\_authentication\_only in the azuread\_administrator block is true. When omitted, Azure will generate a default username which cannot be subsequently changed. Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password)
+
+Description: The password associated with the administrator\_login user. Needs to comply with Azure's Password Policy. Required unless azuread\_authentication\_only in the azuread\_administrator block is true.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator)
+
+Description: The Azure AD administrator block for the Azure SQL Server.
+
+Type:
+
+```hcl
+object({
+    login_username              = string
+    object_id                   = string
+    tenant_id                   = optional(string)
+    azuread_authentication_only = optional(bool)
+  })
+```
+
+Default: `null`
+
+### <a name="input_connection_policy"></a> [connection\_policy](#input\_connection\_policy)
+
+Description: The connection policy for the Azure SQL Server.
+
+Type: `string`
+
+Default: `"Default"`
 
 ### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
 
@@ -118,15 +147,27 @@ map(object({
 
 Default: `{}`
 
-### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+### <a name="input_identity"></a> [identity](#input\_identity)
 
-Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see <https://aka.ms/avm/telemetryinfo>.  
-If it is set to false, then no telemetry will be collected.
+Description: The identity block for the Azure SQL Server.
 
-Type: `bool`
+Type:
 
-Default: `true`
+```hcl
+object({
+    type         = string
+    identity_ids = list(string)
+  })
+```
+
+Default:
+
+```json
+{
+  "identity_ids": [],
+  "type": "SystemAssigned"
+}
+```
 
 ### <a name="input_location"></a> [location](#input\_location)
 
@@ -165,6 +206,30 @@ object({
 ```
 
 Default: `{}`
+
+### <a name="input_minimum_tls_version"></a> [minimum\_tls\_version](#input\_minimum\_tls\_version)
+
+Description: The minimum TLS version for the Azure SQL Server.
+
+Type: `string`
+
+Default: `"1.2"`
+
+### <a name="input_outbound_network_restriction_enabled"></a> [outbound\_network\_restriction\_enabled](#input\_outbound\_network\_restriction\_enabled)
+
+Description: Whether outbound network restriction is enabled for the Azure SQL Server.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_primary_user_assigned_identity_id"></a> [primary\_user\_assigned\_identity\_id](#input\_primary\_user\_assigned\_identity\_id)
+
+Description: The ID of the primary user assigned identity for the Azure SQL Server.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
@@ -222,6 +287,22 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
+
+Description: Whether public network access is enabled for the Azure SQL Server.
+
+Type: `bool`
+
+Default: `false`
+
+### <a name="input_random_password_length"></a> [random\_password\_length](#input\_random\_password\_length)
+
+Description: The desired length of random password created by this module
+
+Type: `number`
+
+Default: `32`
+
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
 Description: A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -251,6 +332,14 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_sql_version"></a> [sql\_version](#input\_sql\_version)
+
+Description: The version of the Azure SQL Server.
+
+Type: `string`
+
+Default: `"12.0"`
+
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
 Description: The map of tags to be applied to the resource
@@ -258,6 +347,40 @@ Description: The map of tags to be applied to the resource
 Type: `map(any)`
 
 Default: `{}`
+
+### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
+
+Description: The timeouts block for the Azure SQL Server.
+
+Type:
+
+```hcl
+object({
+    create = string
+    update = string
+    read   = string
+    delete = string
+  })
+```
+
+Default:
+
+```json
+{
+  "create": "30m",
+  "delete": "30m",
+  "read": "5m",
+  "update": "30m"
+}
+```
+
+### <a name="input_transparent_data_encryption_key_vault_key_id"></a> [transparent\_data\_encryption\_key\_vault\_key\_id](#input\_transparent\_data\_encryption\_key\_vault\_key\_id)
+
+Description: The ID of the Key Vault key used for Transparent Data Encryption.
+
+Type: `string`
+
+Default: `null`
 
 ## Outputs
 
@@ -270,6 +393,10 @@ Description: A map of private endpoints. The map key is the supplied input to va
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: This is the full output for the resource.
+
+### <a name="output_sql_admin_password"></a> [sql\_admin\_password](#output\_sql\_admin\_password)
+
+Description: n/a
 
 ## Modules
 

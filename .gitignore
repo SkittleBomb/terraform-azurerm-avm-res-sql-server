@@ -41,6 +41,5 @@ avm.tflint.hcl
 avm.tflint_example.hcl
 *tfplan*
 *.md.tmp
-
 # MacOS
 .DS_Store

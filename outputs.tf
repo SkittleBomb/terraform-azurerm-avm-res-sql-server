@@ -13,6 +13,6 @@ output "private_endpoints" {
 }
 
 output "sql_admin_password" {
-  value = local.admin_password
+  value     = local.admin_password
   sensitive = true
 }
