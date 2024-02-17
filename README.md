@@ -27,6 +27,7 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_mssql_outbound_firewall_rule.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
@@ -214,6 +215,25 @@ Description: The minimum TLS version for the Azure SQL Server.
 Type: `string`
 
 Default: `"1.2"`
+
+### <a name="input_outbound_firewall_rule"></a> [outbound\_firewall\_rule](#input\_outbound\_firewall\_rule)
+
+Description: Configuration for the outbound firewall rule
+
+Type:
+
+```hcl
+map(object({
+    name = string
+    timeouts = optional(object({
+      create = string
+      read   = string
+      delete = string
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_outbound_network_restriction_enabled"></a> [outbound\_network\_restriction\_enabled](#input\_outbound\_network\_restriction\_enabled)
 
