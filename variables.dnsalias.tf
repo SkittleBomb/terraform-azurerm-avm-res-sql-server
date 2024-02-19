@@ -1,5 +1,4 @@
 variable "dns_alias" {
-  description = "Configuration for the MSSQL Server DNS Alias"
   type = map(object({
     name = string
     timeouts = optional(object({
@@ -8,5 +7,10 @@ variable "dns_alias" {
       delete = string
     }))
   }))
-  default = {}
+  default     = {}
+  description = <<EOF
+Configuration for the MSSQL Server DNS Alias. This includes the following attributes:
+- name: The name which should be used for this MSSQL Server DNS Alias. Changing this forces a new MSSQL Server DNS Alias to be created.
+- timeouts: (Optional) A timeouts block as documented below.
+EOF  
 }

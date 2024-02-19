@@ -12,7 +12,7 @@ resource "azurerm_private_endpoint" "this" {
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.sqlserver_name}"
     private_connection_resource_id = azurerm_mssql_server.this.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
     is_manual_connection           = false
-    subresource_names              = ["TODO subresource name, see https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview#private-link-resource"]
+    subresource_names              = ["sqlServer"]
   }
 
   dynamic "private_dns_zone_group" {
@@ -29,8 +29,8 @@ resource "azurerm_private_endpoint" "this" {
 
     content {
       name               = ip_configuration.value.name
-      subresource_name   = "TODO subresource name"
-      member_name        = "TODO subresource name"
+      subresource_name   = "sqlServer"
+      member_name        = "sqlServer"
       private_ip_address = ip_configuration.value.private_ip_address
     }
   }

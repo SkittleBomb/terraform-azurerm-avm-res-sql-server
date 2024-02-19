@@ -28,6 +28,7 @@ The following resources are used by this module:
 
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
+- [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
 - [azurerm_mssql_outbound_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) (resource)
@@ -117,6 +118,116 @@ object({
 
 Default: `{}`
 
+### <a name="input_database"></a> [database](#input\_database)
+
+Description: Configuration for the MS SQL Database. This includes the following attributes:
+- name: The name of the MS SQL Database.
+- server\_id: The id of the MS SQL Server on which to create the database.
+- create\_mode: The create mode of the database. Possible values are Copy, Default, OnlineSecondary, PointInTimeRestore, Recovery, Restore, RestoreExternalBackup, RestoreExternalBackupSecondary, RestoreLongTermRetentionBackup and Secondary. Defaults to Default.
+- import: A import block as documented below.
+- creation\_source\_database\_id: The ID of the source database from which to create the new database.
+- collation: Specifies the collation of the database.
+- elastic\_pool\_id: Specifies the ID of the elastic pool containing this database.
+- enclave\_type: Specifies the type of enclave to be used by the database.
+- geo\_backup\_enabled: A boolean that specifies if the Geo Backup Policy is enabled.
+- maintenance\_configuration\_name: The name of the Public Maintenance Configuration window to apply to the database.
+- ledger\_enabled: A boolean that specifies if this is a ledger database.
+- license\_type: Specifies the license type applied to this database.
+- long\_term\_retention\_policy: A long\_term\_retention\_policy block as defined below.
+- max\_size\_gb: The max size of the database in gigabytes.
+- min\_capacity: Minimal capacity that database will always have allocated, if not paused.
+- restore\_point\_in\_time: Specifies the point in time (ISO8601 format) of the source database that will be restored to create the new database.
+- recover\_database\_id: The ID of the database to be recovered.
+- restore\_dropped\_database\_id: The ID of the database to be restored.
+- read\_replica\_count: The number of readonly secondary replicas associated with the database to which readonly application intent connections may be routed.
+- read\_scale: If enabled, connections that have application intent set to readonly in their connection string may be routed to a readonly secondary replica.
+- sample\_name: Specifies the name of the sample schema to apply when creating this database.
+- short\_term\_retention\_policy: A short\_term\_retention\_policy block as defined below.
+- sku\_name: Specifies the name of the SKU used by the database.
+- storage\_account\_type: Specifies the storage account type used to store backups for this database.
+- threat\_detection\_policy: Threat detection policy configuration.
+- identity: An identity block as defined below.
+- transparent\_data\_encryption\_enabled: If set to true, Transparent Data Encryption will be enabled on the database.
+- transparent\_data\_encryption\_key\_vault\_key\_id: The fully versioned Key Vault Key URL to be used as the Customer Managed Key for the Transparent Data Encryption layer.
+- transparent\_data\_encryption\_key\_automatic\_rotation\_enabled: Boolean flag to specify whether TDE automatically rotates the encryption Key to latest version or not.
+- zone\_redundant: Whether or not this database is zone redundant.
+- tags: A mapping of tags to assign to the resource.
+- timeouts: (Optional) A timeouts block as documented below.
+
+Type:
+
+```hcl
+map(object({
+    name                        = string
+    auto_pause_delay_in_minutes = optional(number)
+    create_mode                 = optional(string)
+    import = optional(list(object({
+      storage_uri                  = string
+      storage_key                  = string
+      storage_key_type             = string
+      administrator_login          = string
+      administrator_login_password = string
+      authentication_type          = string
+      storage_account_id           = optional(string)
+    })))
+    creation_source_database_id    = optional(string)
+    collation                      = optional(string)
+    elastic_pool_id                = optional(string)
+    enclave_type                   = optional(string)
+    geo_backup_enabled             = optional(bool)
+    maintenance_configuration_name = optional(string)
+    ledger_enabled                 = optional(bool)
+    license_type                   = optional(string)
+    long_term_retention_policy = optional(object({
+      weekly_retention          = string
+      monthly_retention         = string
+      yearly_retention          = string
+      week_of_year              = number
+      immutable_backups_enabled = bool
+    }))
+    max_size_gb                 = optional(number)
+    min_capacity                = optional(number)
+    restore_point_in_time       = optional(string)
+    recover_database_id         = optional(string)
+    restore_dropped_database_id = optional(string)
+    read_replica_count          = optional(number)
+    read_scale                  = optional(bool)
+    sample_name                 = optional(string)
+    short_term_retention_policy = optional(object({
+      retention_days           = number
+      backup_interval_in_hours = optional(number)
+    }))
+    sku_name             = optional(string)
+    storage_account_type = optional(string)
+    threat_detection_policy = optional(object({
+      state                      = string
+      disabled_alerts            = list(string)
+      email_account_admins       = string
+      email_addresses            = list(string)
+      retention_days             = number
+      storage_account_access_key = string
+      storage_endpoint           = string
+    }))
+    identity = optional(object({
+      type         = string
+      identity_ids = list(string)
+    }))
+    transparent_data_encryption_enabled                        = optional(bool)
+    transparent_data_encryption_key_vault_key_id               = optional(string)
+    transparent_data_encryption_key_automatic_rotation_enabled = optional(bool)
+    zone_redundant                                             = optional(bool)
+    tags                                                       = optional(map(string))
+    timeouts = optional(object({
+      create = optional(string)
+      read   = optional(string)
+      update = optional(string)
+      delete = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description: A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -153,7 +264,9 @@ Default: `{}`
 
 ### <a name="input_dns_alias"></a> [dns\_alias](#input\_dns\_alias)
 
-Description: Configuration for the MSSQL Server DNS Alias
+Description: Configuration for the MSSQL Server DNS Alias. This includes the following attributes:
+- name: The name which should be used for this MSSQL Server DNS Alias. Changing this forces a new MSSQL Server DNS Alias to be created.
+- timeouts: (Optional) A timeouts block as documented below.
 
 Type:
 
@@ -240,7 +353,9 @@ Default: `"1.2"`
 
 ### <a name="input_outbound_firewall_rule"></a> [outbound\_firewall\_rule](#input\_outbound\_firewall\_rule)
 
-Description: Configuration for the outbound firewall rule
+Description: Configuration for the outbound firewall rule. This includes the following attributes:
+- name: The name which should be used for this Outbound Firewall Rule. Changing this forces a new Outbound Firewall Rule to be created.
+- timeouts: (Optional) A timeouts block as documented below.
 
 Type:
 
@@ -376,13 +491,21 @@ Default: `{}`
 
 ### <a name="input_server_extended_auditing_policy"></a> [server\_extended\_auditing\_policy](#input\_server\_extended\_auditing\_policy)
 
-Description: Configuration for the SQL Server extended auditing policy
+Description: Configuration for the SQL Server extended auditing policy. This includes the following attributes:
+- enabled: (Optional) Whether to enable the extended auditing policy. Possible values are true and false. Defaults to true. If enabled is true, storage\_endpoint or log\_monitoring\_enabled are required.
+- storage\_endpoint: (Optional) The blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all extended auditing logs.
+- retention\_in\_days: (Optional) The number of days to retain logs for in the storage account. Defaults to 0.
+- storage\_account\_access\_key: (Optional) The access key to use for the auditing storage account.
+- storage\_account\_access\_key\_is\_secondary: (Optional) Is storage\_account\_access\_key value the storage's secondary key?
+- log\_monitoring\_enabled: (Optional) Enable audit events to Azure Monitor? To enable server audit events to Azure Monitor, please enable its main database audit events to Azure Monitor. Defaults to true.
+- storage\_account\_subscription\_id: (Optional) The ID of the Subscription containing the Storage Account.
+- timeouts: (Optional) A timeouts block as documented below.
 
 Type:
 
 ```hcl
 object({
-    enabled                                 = optional(bool)
+    enabled                                 = optional(bool, false)
     storage_endpoint                        = optional(string)
     retention_in_days                       = optional(number)
     storage_account_access_key              = optional(string)

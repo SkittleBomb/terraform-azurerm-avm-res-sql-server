@@ -1,4 +1,5 @@
 resource "azurerm_mssql_server_extended_auditing_policy" "this" {
+  count                                   = var.server_extended_auditing_policy.enabled ? 1 : 0
   server_id                               = azurerm_mssql_server.this.id
   enabled                                 = var.server_extended_auditing_policy.enabled
   storage_endpoint                        = var.server_extended_auditing_policy.storage_endpoint
