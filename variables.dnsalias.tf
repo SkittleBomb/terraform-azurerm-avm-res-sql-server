@@ -8,4 +8,5 @@ variable "dns_alias" {
       delete = string
     }))
   }))
+  default = {}
 }

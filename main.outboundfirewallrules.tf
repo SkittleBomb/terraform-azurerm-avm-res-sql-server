@@ -1,4 +1,4 @@
-resource "azurerm_mssql_outbound_firewall_rule" "main" {
+resource "azurerm_mssql_outbound_firewall_rule" "this" {
   for_each = var.outbound_firewall_rule
 
   name      = each.value.name

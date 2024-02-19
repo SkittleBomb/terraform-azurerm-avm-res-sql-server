@@ -27,9 +27,11 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_mssql_outbound_firewall_rule.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
+- [azurerm_mssql_outbound_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) (resource)
+- [azurerm_mssql_server_extended_auditing_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_extended_auditing_policy) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
@@ -40,23 +42,6 @@ The following resources are used by this module:
 ## Required Inputs
 
 The following input variables are required:
-
-### <a name="input_dns_alias"></a> [dns\_alias](#input\_dns\_alias)
-
-Description: Configuration for the MSSQL Server DNS Alias
-
-Type:
-
-```hcl
-map(object({
-    name = string
-    timeouts = optional(object({
-      create = string
-      read   = string
-      delete = string
-    }))
-  }))
-```
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
@@ -134,7 +119,7 @@ Default: `{}`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
-Description: A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description: A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -153,7 +138,7 @@ Type:
 map(object({
     name                                     = optional(string, null)
     log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
+    log_groups                               = optional(set(string), [])
     metric_categories                        = optional(set(string), ["AllMetrics"])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
@@ -161,6 +146,25 @@ map(object({
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_dns_alias"></a> [dns\_alias](#input\_dns\_alias)
+
+Description: Configuration for the MSSQL Server DNS Alias
+
+Type:
+
+```hcl
+map(object({
+    name = string
+    timeouts = optional(object({
+      create = string
+      read   = string
+      delete = string
+    }))
   }))
 ```
 
@@ -370,6 +374,32 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_server_extended_auditing_policy"></a> [server\_extended\_auditing\_policy](#input\_server\_extended\_auditing\_policy)
+
+Description: Configuration for the SQL Server extended auditing policy
+
+Type:
+
+```hcl
+object({
+    enabled                                 = optional(bool)
+    storage_endpoint                        = optional(string)
+    retention_in_days                       = optional(number)
+    storage_account_access_key              = optional(string)
+    storage_account_access_key_is_secondary = optional(bool)
+    log_monitoring_enabled                  = optional(bool)
+    storage_account_subscription_id         = optional(string)
+    timeouts = optional(object({
+      read   = string
+      create = string
+      update = string
+      delete = string
+    }))
+  })
+```
+
+Default: `{}`
+
 ### <a name="input_sql_version"></a> [sql\_version](#input\_sql\_version)
 
 Description: The version of the Azure SQL Server.
@@ -423,6 +453,18 @@ Default: `null`
 ## Outputs
 
 The following outputs are exported:
+
+### <a name="output_auditing_policy_ids"></a> [auditing\_policy\_ids](#output\_auditing\_policy\_ids)
+
+Description: The IDs of the SQL Server extended auditing policies
+
+### <a name="output_dns_aliases"></a> [dns\_aliases](#output\_dns\_aliases)
+
+Description: The IDs and DNS records of the MSSQL Server DNS Aliases
+
+### <a name="output_outbound_firewall_rule_ids"></a> [outbound\_firewall\_rule\_ids](#output\_outbound\_firewall\_rule\_ids)
+
+Description: The IDs of the MSSQL outbound firewall rules
 
 ### <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints)
 
