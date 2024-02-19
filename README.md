@@ -29,10 +29,12 @@ The following resources are used by this module:
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
+- [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
 - [azurerm_mssql_outbound_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
 - [azurerm_mssql_server_dns_alias.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_dns_alias) (resource)
 - [azurerm_mssql_server_extended_auditing_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_extended_auditing_policy) (resource)
+- [azurerm_mssql_virtual_network_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_virtual_network_rule) (resource)
 - [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
@@ -283,6 +285,32 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_firewall_rule"></a> [firewall\_rule](#input\_firewall\_rule)
+
+Description: Configuration for the Firewall Rule. This includes the following attributes:
+- name: The name of the firewall rule. Changing this forces a new resource to be created.
+- start\_ip\_address: The starting IP address to allow through the firewall for this rule.
+- end\_ip\_address: The ending IP address to allow through the firewall for this rule.
+- timeouts: (Optional) A timeouts block as documented below.
+
+Type:
+
+```hcl
+map(object({
+    name             = string
+    start_ip_address = string
+    end_ip_address   = string
+    timeouts = optional(object({
+      create = optional(string)
+      read   = optional(string)
+      update = optional(string)
+      delete = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_identity"></a> [identity](#input\_identity)
 
 Description: The identity block for the Azure SQL Server.
@@ -350,6 +378,33 @@ Description: The minimum TLS version for the Azure SQL Server.
 Type: `string`
 
 Default: `"1.2"`
+
+### <a name="input_network_rule"></a> [network\_rule](#input\_network\_rule)
+
+Description: Configuration for the Network Rule. This includes the following attributes:
+- name: The name of the SQL virtual network rule. Changing this forces a new resource to be created.
+- server\_id: The resource ID of the SQL Server to which this SQL virtual network rule will be applied. Changing this forces a new resource to be created.
+- subnet\_id: The ID of the subnet from which the SQL server will accept communications.
+- ignore\_missing\_vnet\_service\_endpoint: Create the virtual network rule before the subnet has the virtual network service endpoint enabled. Defaults to false.
+- timeouts: (Optional) A timeouts block as documented below.
+
+Type:
+
+```hcl
+map(object({
+    name                                 = string
+    subnet_id                            = string
+    ignore_missing_vnet_service_endpoint = optional(bool)
+    timeouts = optional(object({
+      create = optional(string)
+      read   = optional(string)
+      update = optional(string)
+      delete = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_outbound_firewall_rule"></a> [outbound\_firewall\_rule](#input\_outbound\_firewall\_rule)
 

@@ -76,10 +76,28 @@ module "sql_server" {
   sqlserver_name      = module.naming.sql_server.name_unique
   resource_group_name = azurerm_resource_group.this.name
 
+  public_network_access_enabled = true
+
   private_endpoints = {
     private_endpoint1 = {
       location           = azurerm_resource_group.this.location
       subnet_resource_id = azurerm_subnet.privateendpoint.id
+    }
+  }
+
+  firewall_rule = {
+    Allow_Azure_Services = {
+      name             = "Allow_Azure_Services"
+      start_ip_address = "0.0.0.0"
+      end_ip_address   = "0.0.0.0"
+    }
+  }
+
+  network_rule = {
+    sql-vnet-rule = {
+      name                                 = "sql-vnet-rule"
+      subnet_id                            = azurerm_subnet.privateendpoint.id
+      ignore_missing_vnet_service_endpoint = true
     }
   }
 
@@ -89,17 +107,9 @@ module "sql_server" {
       collation    = "SQL_Latin1_General_CP1_CI_AS"
       license_type = "LicenseIncluded"
       sku_name     = "S0"
-    },
-    db2 = {
-      name         = "${module.naming.mssql_database.name_unique}2"
-      collation    = "SQL_Latin1_General_CP1_CI_AS"
-      license_type = "LicenseIncluded"
-      sku_name     = "S0"
     }
   }
 }
-
-
 ```
 
 <!-- markdownlint-disable MD033 -->
