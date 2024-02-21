@@ -210,7 +210,8 @@ variable "managed_identities" {
 
 variable "private_endpoints" {
   type = map(object({
-    name = optional(string, null)
+    name             = optional(string, null)
+    subresource_name = string
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string

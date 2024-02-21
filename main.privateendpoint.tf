@@ -1,7 +1,7 @@
 # TODO remove this code & var.private_endpoints if private link is not support.  Note it must be included in this module if it is supported.
 resource "azurerm_private_endpoint" "this" {
   for_each                      = var.private_endpoints
-  name                          = each.value.name != null ? each.value.name : "pe-${var.sqlserver_name}"
+  name                          = each.value.name != null ? each.value.name : "${var.sqlserver_name}-${each.value.subresource_name}-private-endpoint"
   location                      = coalesce(each.value.location, var.location, local.resource_group_location)
   resource_group_name           = each.value.resource_group_name != null ? each.value.resource_group_name : var.resource_group_name
   subnet_id                     = each.value.subnet_resource_id
@@ -10,9 +10,9 @@ resource "azurerm_private_endpoint" "this" {
 
   private_service_connection {
     name                           = each.value.private_service_connection_name != null ? each.value.private_service_connection_name : "pse-${var.sqlserver_name}"
-    private_connection_resource_id = azurerm_mssql_server.this.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
+    private_connection_resource_id = azurerm_mssql_server.this.id 
     is_manual_connection           = false
-    subresource_names              = ["sqlServer"]
+    subresource_names              = [each.value.subresource_name]
   }
 
   dynamic "private_dns_zone_group" {
@@ -29,8 +29,8 @@ resource "azurerm_private_endpoint" "this" {
 
     content {
       name               = ip_configuration.value.name
-      subresource_name   = "sqlServer"
-      member_name        = "sqlServer"
+      member_name        = ip_configuration.value.member_name
+      subresource_name   = ip_configuration.value.subresource_name
       private_ip_address = ip_configuration.value.private_ip_address
     }
   }

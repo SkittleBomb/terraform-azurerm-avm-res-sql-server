@@ -74,6 +74,7 @@ module "sql_server" {
 
   private_endpoints = {
     private_endpoint1 = {
+      subresource_name   = "sqlServer"
       location           = azurerm_resource_group.this.location
       subnet_resource_id = azurerm_subnet.privateendpoint.id
     }
