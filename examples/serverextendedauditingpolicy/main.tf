@@ -66,13 +66,73 @@ module "sql_server" {
     log_monitoring_enabled = true
   }
 
+  database_extended_auditing_policy = {
+    db1 = {
+      enabled                = true
+      database_id            = "${module.sql_server.databases["db1"]["id"]}"
+      log_monitoring_enabled = true
+    },
+    db2 = {
+      enabled                = true
+      database_id            = "${module.sql_server.databases["db2"]["id"]}"
+      log_monitoring_enabled = true
+    }
+  }
+
+  database = {
+    db1 = {
+      name         = module.naming.mssql_database.name_unique
+      collation    = "SQL_Latin1_General_CP1_CI_AS"
+      license_type = "LicenseIncluded"
+      sku_name     = "S0"
+    },
+    db2 = {
+      name         = "${module.naming.mssql_database.name_unique}1"
+      collation    = "SQL_Latin1_General_CP1_CI_AS"
+      license_type = "LicenseIncluded"
+      sku_name     = "S0"
+    }
+  }
+
+
+
   diagnostic_settings = {
     diagnostic_settings1 = {
-      name                  = module.naming.monitor_diagnostic_setting.name_unique
-      workspace_resource_id = azurerm_log_analytics_workspace.this.id
+      name                                     = module.naming.monitor_diagnostic_setting.name_unique
+      target_resource_id                       = "${module.sql_server.resource.id}/databases/master"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["SQLSecurityAuditEvents"]
+      log_groups                               = []
+      metric_categories                        = ["Basic", "InstanceAndAppAdvanced", "WorkloadManagement"]
+      storage_account_resource_id              = null
+      event_hub_authorization_rule_resource_id = null
+      event_hub_name                           = null
+      marketplace_partner_resource_id          = null
+    },
+    diagnostic_settings2 = {
+      name                                     = module.naming.monitor_diagnostic_setting.name_unique
+      target_resource_id                       = "${module.sql_server.databases["db1"]["id"]}"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["SQLSecurityAuditEvents"]
+      log_groups                               = []
+      metric_categories                        = ["Basic", "InstanceAndAppAdvanced", "WorkloadManagement"]
+      storage_account_resource_id              = null
+      event_hub_authorization_rule_resource_id = null
+      event_hub_name                           = null
+      marketplace_partner_resource_id          = null
+    },
+    diagnostic_settings3 = {
+      name                                     = module.naming.monitor_diagnostic_setting.name_unique
+      target_resource_id                       = "${module.sql_server.databases["db2"]["id"]}"
+      workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
+      log_categories                           = ["SQLSecurityAuditEvents"]
+      log_groups                               = []
+      metric_categories                        = ["Basic", "InstanceAndAppAdvanced", "WorkloadManagement"]
+      storage_account_resource_id              = null
+      event_hub_authorization_rule_resource_id = null
+      event_hub_name                           = null
+      marketplace_partner_resource_id          = null
     }
-
   }
 }
-
 

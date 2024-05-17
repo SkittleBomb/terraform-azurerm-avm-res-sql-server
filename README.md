@@ -29,6 +29,7 @@ The following resources are used by this module:
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) (resource)
+- [azurerm_mssql_database_extended_auditing_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) (resource)
 - [azurerm_mssql_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) (resource)
 - [azurerm_mssql_outbound_firewall_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_outbound_firewall_rule) (resource)
 - [azurerm_mssql_server.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) (resource)
@@ -230,30 +231,64 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_database_extended_auditing_policy"></a> [database\_extended\_auditing\_policy](#input\_database\_extended\_auditing\_policy)
+
+Description: Configuration for the SQL Database extended auditing policy. This includes the following attributes:
+- database\_id: (Required) The ID of the SQL database to set the extended auditing policy. Changing this forces a new resource to be created.
+- enabled: (Optional) Whether to enable the extended auditing policy. Possible values are true and false. Defaults to true. If enabled is true, storage\_endpoint or log\_monitoring\_enabled are required.
+- storage\_endpoint: (Optional) The blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all extended auditing logs.
+- retention\_in\_days: (Optional) The number of days to retain logs for in the storage account. Defaults to 0.
+- storage\_account\_access\_key: (Optional) The access key to use for the auditing storage account.
+- storage\_account\_access\_key\_is\_secondary: (Optional) Is storage\_account\_access\_key value the storage's secondary key?
+- log\_monitoring\_enabled: (Optional) Enable audit events to Azure Monitor? Defaults to true.
+- timeouts: (Optional) A timeouts block as documented below.
+
+Type:
+
+```hcl
+map(object({
+    enabled                                 = optional(bool, false)
+    database_id                             = optional(string)
+    storage_endpoint                        = optional(string)
+    retention_in_days                       = optional(number)
+    storage_account_access_key              = optional(string)
+    storage_account_access_key_is_secondary = optional(bool)
+    log_monitoring_enabled                  = optional(bool)
+    timeouts = optional(object({
+      read   = string
+      create = string
+      update = string
+      delete = string
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description: A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
-- `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+- `target_resource_id` - (Required) The ID of the resource to which the diagnostic settings will be applied.
+- `log_categories` - (Optional) A set of log categories to send to the log analytics workspace.
+- `log_groups` - (Optional) A set of log groups to send to the log analytics workspace.
+- `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace.
 - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
 - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
 - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
 - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+- `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.
 
 Type:
 
 ```hcl
 map(object({
     name                                     = optional(string, null)
+    target_resource_id                       = string
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), [])
     metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
@@ -467,7 +502,8 @@ Type:
 
 ```hcl
 map(object({
-    name = optional(string, null)
+    name             = optional(string, null)
+    subresource_name = string
     role_assignments = optional(map(object({
       role_definition_id_or_name             = string
       principal_id                           = string
@@ -635,6 +671,10 @@ The following outputs are exported:
 ### <a name="output_auditing_policy_ids"></a> [auditing\_policy\_ids](#output\_auditing\_policy\_ids)
 
 Description: The IDs of the SQL Server extended auditing policies
+
+### <a name="output_databases"></a> [databases](#output\_databases)
+
+Description: This is the full output for the databases.
 
 ### <a name="output_dns_aliases"></a> [dns\_aliases](#output\_dns\_aliases)
 

@@ -1,9 +1,5 @@
-# TODO: insert outputs here.
-
-# Module owners should include the full resource via a 'resource' output
-# https://azure.github.io/Azure-Verified-Modules/specs/terraform/#id-tffr2---category-outputs---additional-terraform-outputs
 output "resource" {
-  value       = azurerm_mssql_server.this # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
+  value       = azurerm_mssql_server.this
   description = "This is the full output for the resource."
 }
 
@@ -37,3 +33,10 @@ output "dns_aliases" {
     }
   }
 }
+
+output "databases" {
+  value       = azurerm_mssql_database.this
+  description = "This is the full output for the databases."
+}
+
+
