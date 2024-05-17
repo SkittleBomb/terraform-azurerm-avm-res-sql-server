@@ -234,7 +234,6 @@ Default: `{}`
 ### <a name="input_database_extended_auditing_policy"></a> [database\_extended\_auditing\_policy](#input\_database\_extended\_auditing\_policy)
 
 Description: Configuration for the SQL Database extended auditing policy. This includes the following attributes:
-- database\_id: (Required) The ID of the SQL database to set the extended auditing policy. Changing this forces a new resource to be created.
 - enabled: (Optional) Whether to enable the extended auditing policy. Possible values are true and false. Defaults to true. If enabled is true, storage\_endpoint or log\_monitoring\_enabled are required.
 - storage\_endpoint: (Optional) The blob storage endpoint (e.g. https://example.blob.core.windows.net). This blob storage will hold all extended auditing logs.
 - retention\_in\_days: (Optional) The number of days to retain logs for in the storage account. Defaults to 0.
@@ -248,7 +247,6 @@ Type:
 ```hcl
 map(object({
     enabled                                 = optional(bool, false)
-    database_id                             = optional(string)
     storage_endpoint                        = optional(string)
     retention_in_days                       = optional(number)
     storage_account_access_key              = optional(string)
