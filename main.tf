@@ -82,7 +82,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   for_each = var.diagnostic_settings
 
   name                           = each.value.name != null ? each.value.name : "diag-${var.sqlserver_name}"
-  target_resource_id             = each.value.target_resource_id
+  target_resource_id             = "${azurerm_mssql_server.this.id}/${each.value.service_type}"
   eventhub_authorization_rule_id = each.value.event_hub_authorization_rule_resource_id
   eventhub_name                  = each.value.event_hub_name
   log_analytics_workspace_id     = each.value.workspace_resource_id

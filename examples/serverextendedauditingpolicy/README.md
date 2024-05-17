@@ -105,7 +105,6 @@ module "sql_server" {
   diagnostic_settings = {
     diagnostic_settings1 = {
       name                                     = module.naming.monitor_diagnostic_setting.name_unique
-      target_resource_id                       = "${module.sql_server.resource.id}/databases/master"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       log_categories                           = ["SQLSecurityAuditEvents"]
       log_groups                               = []
@@ -117,7 +116,7 @@ module "sql_server" {
     },
     diagnostic_settings2 = {
       name                                     = module.naming.monitor_diagnostic_setting.name_unique
-      target_resource_id                       = "${module.sql_server.databases["db1"]["id"]}"
+      service_type                             = "databases/${module.naming.mssql_database.name_unique}"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       log_categories                           = ["SQLSecurityAuditEvents"]
       log_groups                               = []
@@ -129,7 +128,7 @@ module "sql_server" {
     },
     diagnostic_settings3 = {
       name                                     = module.naming.monitor_diagnostic_setting.name_unique
-      target_resource_id                       = "${module.sql_server.databases["db2"]["id"]}"
+      service_type                             = "databases/${module.naming.mssql_database.name_unique}1"
       workspace_resource_id                    = azurerm_log_analytics_workspace.this.id
       log_categories                           = ["SQLSecurityAuditEvents"]
       log_groups                               = []

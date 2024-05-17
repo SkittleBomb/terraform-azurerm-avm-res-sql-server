@@ -142,7 +142,6 @@ variable "customer_managed_key" {
 variable "diagnostic_settings" {
   type = map(object({
     name                                     = optional(string, null)
-    target_resource_id                       = string
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), [])
     metric_categories                        = optional(set(string), ["AllMetrics"])
@@ -151,6 +150,7 @@ variable "diagnostic_settings" {
     event_hub_authorization_rule_resource_id = optional(string, null)
     event_hub_name                           = optional(string, null)
     marketplace_partner_resource_id          = optional(string, null)
+    service_type                             = optional(string, "databases/master")
   }))
   default  = {}
   nullable = false
@@ -168,7 +168,6 @@ variable "diagnostic_settings" {
 A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
 - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-- `target_resource_id` - (Required) The ID of the resource to which the diagnostic settings will be applied.
 - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace.
 - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace.
 - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace.
