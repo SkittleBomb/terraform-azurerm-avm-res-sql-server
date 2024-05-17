@@ -69,12 +69,10 @@ module "sql_server" {
   database_extended_auditing_policy = {
     db1 = {
       enabled                = true
-      database_id            = "${module.sql_server.databases["db1"]["id"]}"
       log_monitoring_enabled = true
     },
     db2 = {
       enabled                = true
-      database_id            = "${module.sql_server.databases["db2"]["id"]}"
       log_monitoring_enabled = true
     }
   }

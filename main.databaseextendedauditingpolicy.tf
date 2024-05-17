@@ -1,7 +1,7 @@
 resource "azurerm_mssql_database_extended_auditing_policy" "this" {
   for_each = var.database_extended_auditing_policy
 
-  database_id                             = each.value.database_id
+  database_id                             = azurerm_mssql_database.this[each.key].id
   enabled                                 = each.value.enabled
   storage_endpoint                        = each.value.storage_endpoint
   retention_in_days                       = each.value.retention_in_days
